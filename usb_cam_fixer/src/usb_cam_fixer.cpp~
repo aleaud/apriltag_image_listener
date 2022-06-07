@@ -1,0 +1,32 @@
+#include "ros/ros.h"
+#include "nav_msgs/Odometry.h"
+#include "sensor_msgs/Image.h"
+#include <iostream>
+#include <fstream>
+
+// Callback
+void odomCallback(const nav_msgs::OdometryPtr& msg){
+  geometry_msgs::Point& robot_position = msg->pose.pose.position;
+  ROS_INFO("Odom msg received !");
+  *output_file << robot_position.x << " " << robot_position.y << std::endl;
+}
+
+// Callback
+void ImageCallback(const sensor_msgs::ImagePtr& msg){
+  geometry_msgs::Point& robot_position = msg->pose.pose.position;
+  ROS_INFO("image_msg received !");
+  *output_file << robot_position.x << " " << robot_position.y << std::endl;
+}
+
+int main(int argc, char** argv){
+
+  std::string odom_topic = "/odom";
+  std::string image_topic = "/image";
+  ros::init(argc, argv, "dump_orazio_odom_node");
+  ros::NodeHandle nh;
+  ros::Subscriber sub_odom = nh.subscribe(odom_topic,10,odomCallback);
+  ros::Subscriber sub_image = nh.subscribe(odom_topic,10,odomCallback);
+  ros::spin();
+  output_file->close();
+  return 0;
+}
